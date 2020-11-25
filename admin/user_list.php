@@ -40,6 +40,8 @@ if(empty($_SESSION['user_id']) && empty($SESSION['logged_in'])) {
                       <th style="width: 10px">#</th>
                       <th>Name</th>
                       <th>Email</th>
+                      <th>Address</th>
+                      <th>Phone</th>
                       <th>Role</th>
                       <th style="width: 40px">Actions</th>
                     </tr>
@@ -89,6 +91,8 @@ if(empty($_SESSION['user_id']) && empty($SESSION['logged_in'])) {
                       <td><?php echo $i;?></td>
                       <td><?php echo escape($value['name']);?></td>
                       <td><?php echo escape($value['email']);?></td>
+                      <td><?php echo escape($value['address']);?></td>
+                      <td><?php echo escape($value['phone']);?></td>
                       <td><?php echo ($value['role']==1) ? "admin": "user";?></td>
                       <td class="btn-group">
                       <div class="container"><a href="user_edit.php?id=<?php echo escape($value['id'])?>" type="submit" class="btn btn-warning">Edit</a></div>

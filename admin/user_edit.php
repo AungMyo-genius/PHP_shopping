@@ -11,13 +11,20 @@ $nameErr = $emailErr= $passErr='';
 $name = $email = '';
 if(!empty($_POST)) {
 
-  if(empty($_POST['name']) || empty($_POST['email'])) {
+  if(empty($_POST['name']) || empty($_POST['email']) || empty($_POST['phone']) || empty($_POST['address'])) {
     if(empty($_POST['name'])) {
       $nameErr = "Plz fill the name";
     }
     if(empty($_POST['email'])) {
       $emailErr = "Plz fill the email";
     }
+    if(empty($_POST['address'])) {
+      $phoneErr = "Plz fill the phone Number";
+    }
+    if(empty($_POST['phone'])) {
+      $addErr = "Plz fill the address";
+    }
+
 
 
   } elseif(!empty($_POST['password']) && (strlen($_POST["password"]) < 5)) {
@@ -30,6 +37,8 @@ if(!empty($_POST)) {
     $password=password_hash($_POST['password'],PASSWORD_DEFAULT);
     $role=$_POST['role'];
     $id = $_POST['id'];
+    $phone = $_POST['phone'];
+    $address = $_POST['address'];
 
     $stmt = $pdo->prepare("SELECT * FROM users WHERE email = :email AND id!=:id");
     $stmt->bindValue(':email',$email);
@@ -43,14 +52,16 @@ if(!empty($_POST)) {
 
     else {
       if($password != null) {
-        $stmt = $pdo->prepare("UPDATE users SET name=:name, email=:email,password=:password,role=:role WHERE id=".$_POST['id']);
+        $stmt = $pdo->prepare("UPDATE users SET name=:name,email=:email,password=:password,address=:address,
+          phone=:phone,role=:role WHERE id=".$_POST['id']);
         $result = $stmt->execute(
-          array(':name'=>$name, ':email'=>$email,':password'=>$password,':role'=>$role)
+          array(':name'=>$name, ':email'=>$email,':password'=>$password,':address'=>$address,':phone'=>$phone,':role'=>$role)
         );
       } else {
-        $stmt = $pdo->prepare("UPDATE users SET name=:name, email=:email,role=:role WHERE id=".$_POST['id']);
+        $stmt = $pdo->prepare("UPDATE users SET name=:name, email=:email,address=:address,
+          phone=:phone,role=:role WHERE id=".$_POST['id']);
         $result = $stmt->execute(
-          array(':name'=>$name, ':email'=>$email,':role'=>$role)
+          array(':name'=>$name, ':email'=>$email,':address'=>$address,':phone'=>$phone,':role'=>$role)
         );
       }
 
@@ -96,6 +107,16 @@ $result = $stmt->fetchAll();
                     <label for="email">Email</label>
                     <input type="email" class="form-control" name="email" id="email" value="<?php echo escape($result[0]['email'])?>">
                     <span style="color:red;"><?php echo $emailErr;?></span>
+                  </div>
+                  <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="number" class="form-control" name="phone" id="phone" value="<?php echo escape($result[0]['phone'])?>">
+                    <p style="color:red;"><?php echo empty($phoneErr)? '':'*'.$phoneErr;?></p>
+                  </div>
+                  <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" class="form-control" name="address" id="address" value="<?php echo escape($result[0]['address'])?>">
+                    <p style="color:red;"><?php echo empty($addErr)? '':'*'.$addErr;?></p>
                   </div>
                   <div class="form-group">
                     <label for="password">Password:</label>
