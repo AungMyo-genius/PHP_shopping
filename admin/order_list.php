@@ -1,6 +1,5 @@
 <?php
 
-
 session_start();
 require '../config/config.php';
 require '../config/common.php';
@@ -8,14 +7,7 @@ require '../config/common.php';
 if(empty($_SESSION['user_id']) && empty($SESSION['logged_in'])) {
   header('location: login.php');
 }
-
-
- ?>
-
-
-
-
-
+?>
 
 
 <?php include 'header.php'; ?>
@@ -26,24 +18,20 @@ if(empty($_SESSION['user_id']) && empty($SESSION['logged_in'])) {
           <div class="col-md-12">
             <div class="card">
               <div class="card-header">
-                <h3 class="card-title">Products Listing</h3>
+                <h3 class="card-title">Order Listing</h3>
               </div>
               <!-- /.card-header -->
               <div class="card-body">
                 <table class="table table-bordered">
-                  <div>
-                    <a href="product_add.php" type="submit" class="btn btn-success">Create New Product</a>
-                  </div>
                   <br>
                   <thead>
                     <tr>
                       <th style="width: 10px">#</th>
                       <th>Name</th>
-                      <th>Description</th>
-                      <th>Category</th>
-                      <th>In Stock</th>
-                      <th>Price</th>
-                      <th style="width: 40px">Actions</th>
+                      <th>Total Price</th>
+                      <th>Order Time</th>
+
+                      <th style="width: 150px">Actions</th>
                     </tr>
                   </thead>
                   <?php
@@ -55,29 +43,12 @@ if(empty($_SESSION['user_id']) && empty($SESSION['logged_in'])) {
                     }
                     $numOfrecs = 5;
                     $offset = ($pageno-1) * $numOfrecs;
-                    $stmt = $pdo->prepare("SELECT * from products ORDER BY id DESC");
+                    $stmt = $pdo->prepare("SELECT * from sale_orders ORDER BY id DESC");
                     $stmt->execute();
                     $rawResult = $stmt->fetchALL();
                     $total_pages = ceil(count($rawResult)/ $numOfrecs);
 
-                    $stmt = $pdo->prepare("SELECT * from products ORDER BY id DESC LIMIT $offset,$numOfrecs");
-                    $stmt->execute();
-                    $result = $stmt->fetchALL();
-                  } else {
-                    $searchKey = $_POST['search'];
-                    if(!empty($_GET['pageno'])) {
-                      $pageno = $_GET['pageno'];
-                    } else {
-                      $pageno = 1;
-                    }
-                    $numOfrecs = 1;
-                    $offset = ($pageno-1) * $numOfrecs;
-                    $stmt = $pdo->prepare("SELECT * from products WHERE name LIKE '%$searchKey%' ORDER BY id DESC");
-                    $stmt->execute();
-                    $rawResult = $stmt->fetchALL();
-                    $total_pages = ceil(count($rawResult)/ $numOfrecs);
-
-                    $stmt = $pdo->prepare("SELECT * from products WHERE name LIKE '%$searchKey%' ORDER BY id DESC LIMIT $offset,$numOfrecs");
+                    $stmt = $pdo->prepare("SELECT * from sale_orders ORDER BY id DESC LIMIT $offset,$numOfrecs");
                     $stmt->execute();
                     $result = $stmt->fetchALL();
                   }
@@ -88,22 +59,19 @@ if(empty($_SESSION['user_id']) && empty($SESSION['logged_in'])) {
                       foreach($result as $value) {
                     ?>
 
-                    <?php $catStmt = $pdo->prepare("SELECT * from categories WHERE id=".$value['category_id']);
-                          $catStmt->execute();
-                          $catResult = $catStmt->fetchAll();
+                    <?php
+                      $rawStmt = $pdo->prepare("SELECT * FROM users WHERE id=".$value['user_id']);
+                      $rawStmt->execute();
+                      $userRes = $rawStmt->fetchAll();
                     ?>
                     <tr>
                       <td><?php echo $i;?></td>
-                      <td><?php echo escape($value['name']);?></td>
-                      <td><?php echo escape(substr($value['description'],0,30));?></td>
-                      <td><?php echo $catResult[0]['name'];?></td>
-                      <td><?php echo $value['quantity'];?></td>
-                      <td><?php echo $value['price'];?></td>
+                      <td><?php echo escape($userRes[0]['name']);?></td>
+                      <td><?php echo escape($value['total_price']);?></td>
+                      <td><?php echo escape( date('Y-m-d', strtotime($value['order_date'])));?></td>
+
                       <td class="btn-group">
-                      <div class="container"><a href="product_edit.php?id=<?php echo escape($value['id'])?>" type="submit" class="btn btn-warning">Edit</a></div>
-                      <div class="container"><a href="product_delete.php?id=<?php echo escape($value['id'])?>"
-                        onclick="return confirm('Are you want to delete this item.')"
-                        type="submit" class="btn btn-danger">Delete</a></div>
+                      <div class="container"><a href="order_detail.php?id=<?php echo escape($value['id'])?>&name=<?php echo escape($userRes[0]['name']) ?>" type="submit" class="btn btn-default">Order Detail</a></div>
 
                       </td>
                     </tr>

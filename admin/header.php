@@ -1,9 +1,9 @@
 <?php
 
 
-if($_SESSION['role'] != 1 ) {
-  header("Location: ../index.php");
-}
+// if($_SESSION['role'] != 1 ) {
+//   header("Location: ../index.php");
+// }
  ?>
 <!DOCTYPE html>
 
@@ -39,28 +39,31 @@ if($_SESSION['role'] != 1 ) {
     $link_array = explode('/',$link);
     $page = end($link_array);
     ?>
-    <form class="form-inline ml-3" action="<?php
-      switch($page) {
-          case "index.php":
-        echo "index.php";
-          break;
-          case "category.php":
-        echo "category.php";
-          break;
-          case "user_list.php":
-        echo "user_list.php";
-          break;
-          }?>" method="post">
-      <div class="input-group input-group-sm">
-        <input name="_token" type="hidden" value="<?php echo escape($_SESSION['_token']); ?>">
-        <input class="form-control form-control-navbar" name="search" type="search" placeholder="Search" aria-label="Search">
-        <div class="input-group-append">
-          <button class="btn btn-navbar" type="submit">
-            <i class="fas fa-search"></i>
-          </button>
+
+    <?php if($page != 'order_list.php' && $page != 'order_detail.php') {?>
+      <form class="form-inline ml-3" action="<?php
+        switch($page) {
+            case "index.php":
+          echo "index.php";
+            break;
+            case "category.php":
+          echo "category.php";
+            break;
+            case "user_list.php":
+          echo "user_list.php";
+            break;
+            }?>" method="post">
+        <div class="input-group input-group-sm">
+          <input name="_token" type="hidden" value="<?php echo escape($_SESSION['_token']); ?>">
+          <input class="form-control form-control-navbar" name="search" type="search" placeholder="Search" aria-label="Search">
+          <div class="input-group-append">
+            <button class="btn btn-navbar" type="submit">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
         </div>
-      </div>
-    </form>
+      </form>
+    <?php } ?>
 
     <ul class="nav navbar-nav ml-auto" style="margin-right:30px !important">
       <li class="nav-item">
@@ -122,6 +125,15 @@ if($_SESSION['role'] != 1 ) {
               <i class="nav-icon fas fa-user"></i>
               <p>
                 Users
+              </p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="order_list.php" class="nav-link">
+              <i class="nav-icon fas fa-table"></i>
+              <p>
+                Order
               </p>
             </a>
           </li>

@@ -15,6 +15,8 @@ if(!empty($_POST)) {
   $password = password_hash($_POST['password'],PASSWORD_DEFAULT);
   $role = $_POST['role'];
   $email = $_POST['email'];
+  $phone = $_POST['phone'];
+  $address = $_POST['address'];
 
     if(empty($_POST['name']) || empty($_POST['email'])|| empty($_POST['password']) || strlen($_POST["password"]) < 5) {
       if(empty($_POST['name'])) {
@@ -40,9 +42,9 @@ if(!empty($_POST)) {
         echo "<script>alert('This email is already exited plz use another email');window.location.href='user_list.php';</script>";
       }
 
-       $stmt = $pdo->prepare("INSERT INTO users (name,email,password,role) VALUES(:name,:email,:password,:role)");
+       $stmt = $pdo->prepare("INSERT INTO users (name,email,password,address,phone,role) VALUES(:name,:email,:password,:address,:phone,:role)");
        $result = $stmt->execute(
-         array(':name'=>$name, ':email'=>$email,':password'=>$password,':role'=>$role)
+         array(':name'=>$name, ':email'=>$email,':password'=>$password, ':address'=>$address, ':phone'=>$phone, ':role'=>$role)
        );
        if($result) {
          echo "<script>alert('New user successfully added');window.location.href='user_list.php'</script>";
@@ -81,6 +83,16 @@ if(!empty($_POST)) {
                     <label for="email">Email</label>
                     <input type="email" class="form-control" name="email" id="email">
                     <p style="color:red;"><?php echo empty($emailErr)? '':'*'.$emailErr;?></p>
+                  </div>
+                  <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="number" class="form-control" name="phone" id="phone">
+                    <p style="color:red;"><?php echo empty($phoneErr)? '':'*'.$phoneErr;?></p>
+                  </div>
+                  <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" class="form-control" name="address" id="address">
+                    <p style="color:red;"><?php echo empty($addErr)? '':'*'.$addErr;?></p>
                   </div>
                   <div class="form-group">
                     <label for="password">Password:</label>
