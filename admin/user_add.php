@@ -18,12 +18,18 @@ if(!empty($_POST)) {
   $phone = $_POST['phone'];
   $address = $_POST['address'];
 
-    if(empty($_POST['name']) || empty($_POST['email'])|| empty($_POST['password']) || strlen($_POST["password"]) < 5) {
+    if(empty($_POST['name']) || empty($_POST['email'])|| empty($_POST['address'])||  empty($_POST['phone']) ||  empty($_POST['password']) || strlen($_POST["password"]) < 5) {
       if(empty($_POST['name'])) {
         $nameErr = "Plz fill the name";
       }
       if(empty($_POST['email'])) {
         $emailErr = "Plz fill the email";
+      }
+      if(empty($_POST['address'])) {
+        $addErr = "Plz fill the address";
+      }
+      if(empty($_POST['phone'])) {
+        $phoneErr = "Plz fill the phone Number";
       }
       if(empty($_POST['password'])) {
         $passErr = "Plz add password";
