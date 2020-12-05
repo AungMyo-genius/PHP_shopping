@@ -4,13 +4,12 @@ require '../config/config.php';
 require '../config/common.php';
 
 
-if(empty($_SESSION['user_id']) && empty($SESSION['logged_in'])) {
-  header('location: login.php');
-}
+
 
 if($_POST) {
   if(empty($_POST['name']) || empty($_POST['description']) || empty($_POST['category'])
-    || empty($_POST['price']) || empty($_POST['quantity']) || empty($_FILES['image'])) {
+    || empty($_POST['price']) || empty($_POST['quantity']) || empty($_FILES['image'])
+  ||($_POST['price'] && (is_numeric( $_POST['price']) != 1)) || ($_POST['quantity'] && (is_numeric( $_POST['quantity']) != 1))) {
     if(empty($_POST['name'])) {
       $nameErr = "name is required";
     }
@@ -51,7 +50,7 @@ if($_POST) {
           move_uploaded_file($_FILES['image']['tmp_name'], $file);
 
           $stmt = $pdo->prepare("UPDATE products SET name=:name, description=:description
-          , category_id=:category, quantity=:quantity, price=:price, image=:image");
+          , category_id=:category, quantity=:quantity, price=:price, image=:image WHERE id=".$_GET['id']);
           $result = $stmt->execute(
             array(":name"=>$name,":description"=>$description,":category"=>$category,":quantity"=>$quantity,":price"=>$price,":image"=>$image)
           );
@@ -67,7 +66,7 @@ if($_POST) {
 
 
         $stmt = $pdo->prepare("UPDATE products SET name=:name, description=:description
-        , category_id=:category, quantity=:quantity, price=:price");
+        , category_id=:category, quantity=:quantity, price=:price WHERE id=".$_GET['id']);
         $result = $stmt->execute(
           array(":name"=>$name,":description"=>$description,":category"=>$category,":quantity"=>$quantity,":price"=>$price)
         );

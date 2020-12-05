@@ -4,9 +4,6 @@ require '../config/config.php';
 require '../config/common.php';
 
 
-if(empty($_SESSION['user_id']) && empty($SESSION['logged_in'])) {
-  header('location: login.php');
-}
 $nameErr = $emailErr= $passErr='';
 $name = $email = '';
 if(!empty($_POST)) {

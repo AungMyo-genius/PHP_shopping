@@ -3,34 +3,48 @@ session_start();
 require 'config/config.php';
 require 'config/common.php';
 
-if($_POST) {
-	$email = $_POST['email'];
-	$password = $_POST['password'];
+if(empty($_SESSION['user_id']) && empty($_SESSION['logged_in']) && empty($_SESSION['cart'])) {
+  header("Location: login.php");
+}
 
-	$stmt = $pdo->prepare("SELECT * from users WHERE email=:email");
-	$stmt->execute(
-		array(":email"=>$email)
-	);
-	$user = $stmt->fetch(PDO::FETCH_ASSOC);
+if(!empty($_SESSION['cart'])) {
+	$userId = $_SESSION['user_id'];
+	$total = 0;
 
-	if($user) {
-		if(password_verify($password, $user['password'])) {
-			$_SESSION['user_id'] = $user['id'];
-			$_SESSION['user_role'] = $user['role'];
-			$_SESSION['username'] = $user['name'];
-			$_SESSION['logged_in'] = time();
-
-			if($user['role'] == 1) {
-				header("Location: admin/index.php");
-			}else{
-				header("Location: index.php");
-			}
-		} else {
-			echo "<script>Incorrect credentials!</script>";
-		}
-	} else {
-		echo "<script>Incorrect credentials!</script>";
+	foreach ($_SESSION['cart'] as $key => $qty) {
+		$id = str_replace('id','',$key);
+		$stmt = $pdo->prepare("SELECT * from products WHERE id=".$id);
+		$stmt->execute();
+		$result = $stmt->fetch(PDO::FETCH_ASSOC);
+		$total += $result['price'] * $qty;
 	}
+	 $stmt = $pdo->prepare("INSERT INTO sale_orders(user_id,total_price,order_date) VALUES(:user_id,:total,:odate)");
+	 $result = $stmt->execute(
+		 array(':user_id'=>$userId, ':total'=>$total, ':odate'=>date('Y-m-d h:i:s'))
+	 );
+
+	 if($result) {
+		 $saleOrderId = $pdo->lastInsertId();
+		 foreach ($_SESSION['cart'] as $key => $qty) {
+		 	$id = str_replace('id','',$key);
+			$stmt = $pdo->prepare("INSERT INTO sale_order_details(sale_order_id,product_id,quantity) VALUES(:sid,:pid,:qty)");
+		  $result = $stmt->execute(
+		 	 array(':sid'=>$saleOrderId, ':pid'=>$id, ':qty'=>$qty)
+		  );
+
+			$qtystmt = $pdo->prepare("SELECT * FROM products WHERE id=".$id);
+			$qtystmt->execute();
+			$qtyResult = $qtystmt->fetch(PDO::FETCH_ASSOC);
+
+			$qtyUpdate = $qtyResult['quantity'] - $qty;
+
+			$qtyUpdateStmt = $pdo->prepare("UPDATE products SET quantity=:quantity WHERE id=:id");
+			$qtyUpdateStmt->execute(
+				array(":quantity"=>$qtyUpdate,":id"=>$id)
+			);
+		}
+			unset($_SESSION['cart']);
+	 }
 }
 
 ?>
@@ -53,7 +67,7 @@ if($_POST) {
 	<!-- meta character set -->
 	<meta charset="UTF-8">
 	<!-- Site Title -->
-	<title>Karma Shop</title>
+	<title>AP Shop</title>
 
 	<!--
 		CSS
@@ -90,6 +104,19 @@ if($_POST) {
 							<li class="nav-item">
 								<button class="search"><span class="lnr lnr-magnifier" id="search"></span></button>
 							</li>
+              <?php
+							if(!empty($_SESSION['logged_in'])) {
+								echo "
+								<li class='nav-item'>
+									<a href='logout.php' type='button' class='fa fa-sign-out' style='margin-top: 30px !important;'>Logout</a>
+								</li>";
+							}else{
+								echo "
+								<li class='nav-item'>
+									<a href='Login.php' type='button' class='fa fa-sign-in' style='margin-top: 30px !important;'>Login</a>
+								</li>";
+							}
+							?>
 						</ul>
 					</div>
 				</div>
@@ -112,10 +139,9 @@ if($_POST) {
 		<div class="container">
 			<div class="breadcrumb-banner d-flex flex-wrap align-items-center justify-content-end">
 				<div class="col-first">
-					<h1>Login/Register</h1>
+					<h1>Confirmation</h1>
 					<nav class="d-flex align-items-center">
-						<a href="index.html">Home<span class="lnr lnr-arrow-right"></span></a>
-						<a href="category.html">Login/Register</a>
+						<a href="index.php">Home<span class="lnr lnr-arrow-right"></span></a>
 					</nav>
 				</div>
 			</div>
@@ -123,56 +149,28 @@ if($_POST) {
 	</section>
 	<!-- End Banner Area -->
 
-	<!--================Login Box Area =================-->
-	<section class="login_box_area section_gap">
+	<!--================Order Details Area =================-->
+	<section class="order_details section_gap">
 		<div class="container">
-			<div class="row">
-				<div class="col-lg-6">
-					<div class="login_box_img">
-						<img class="img-fluid" src="img/login.jpg" alt="">
-						<div class="hover">
-							<h4>New to our website?</h4>
-							<p>There are advances being made in science and technology everyday, and a good example of this is the</p>
-							<a class="primary-btn" href="register.php">Create an Account</a>
-						</div>
-					</div>
-				</div>
-				<div class="col-lg-6">
-					<div class="login_form_inner">
-						<h3>Log in to enter</h3>
-						<form class="row login_form" action="login.php" method="post" id="contactForm" novalidate="novalidate">
-							<input type="hidden" name="_token" value="<?php echo escape($_SESSION['_token']);?>">
-							<div class="col-md-12 form-group">
-								<input type="text" class="form-control" id="name" name="email" placeholder="Username" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Email'">
-							</div>
-							<div class="col-md-12 form-group">
-								<input type="password" class="form-control" id="password" name="password" placeholder="Password" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Password'">
-							</div>
-							<div class="col-md-12 form-group">
-							</div>
-							<div class="col-md-12 form-group">
-								<button type="submit" value="submit" class="primary-btn">Log In</button>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
+			<h3 class="title_confirmation">Thank you. Your order has been received.</h3>
 		</div>
 	</section>
-	<!--================End Login Box Area =================-->
+	<!--================End Order Details Area =================-->
 
 	<!-- start footer Area -->
 	<footer class="footer-area section_gap">
-	<div class="container">
-	<div class="footer-bottom d-flex justify-content-center align-items-center flex-wrap">
-	  <p class="footer-text m-0"><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-	Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved
-	<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-	</p>
-	</div>
-	</div>
+		<div class="container">
+			<div class="footer-bottom d-flex justify-content-center align-items-center flex-wrap">
+				<p class="footer-text m-0"><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made with <i class="fa fa-heart-o" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+</p>
+			</div>
+		</div>
 	</footer>
 	<!-- End footer Area -->
+
+
 
 
 	<script src="js/vendor/jquery-2.2.4.min.js"></script>

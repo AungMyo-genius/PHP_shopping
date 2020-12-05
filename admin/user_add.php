@@ -5,9 +5,7 @@ require '../config/common.php';
 
 
 
-if(empty($_SESSION['user_id']) && empty($SESSION['logged_in'])) {
-  header('location: login.php');
-}
+
 
 
 if(!empty($_POST)) {

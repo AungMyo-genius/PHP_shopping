@@ -4,13 +4,12 @@ require '../config/config.php';
 require '../config/common.php';
 
 
-if(empty($_SESSION['user_id']) && empty($SESSION['logged_in'])) {
-  header('location: login.php');
-}
+
 
 if($_POST) {
   if(empty($_POST['name']) || empty($_POST['description']) || empty($_POST['category'])
-    || empty($_POST['price']) || empty($_POST['quantity']) || empty($_FILES['image'])) {
+    || empty($_POST['price']) || empty($_POST['quantity']) || empty($_FILES['image'])
+  ||($_POST['price'] && (is_numeric( $_POST['price']) != 1)) || ($_POST['quantity'] && (is_numeric( $_POST['quantity']) != 1)) ) {
     if(empty($_POST['name'])) {
       $nameErr = "name is required";
     }

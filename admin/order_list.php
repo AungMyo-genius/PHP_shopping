@@ -4,9 +4,7 @@ session_start();
 require '../config/config.php';
 require '../config/common.php';
 
-if(empty($_SESSION['user_id']) && empty($SESSION['logged_in'])) {
-  header('location: login.php');
-}
+
 ?>
 
 
@@ -35,7 +33,7 @@ if(empty($_SESSION['user_id']) && empty($SESSION['logged_in'])) {
                     </tr>
                   </thead>
                   <?php
-                  if(empty($_POST['search'])) {
+
                     if(!empty($_GET['pageno'])) {
                       $pageno = $_GET['pageno'];
                     } else {
@@ -51,7 +49,7 @@ if(empty($_SESSION['user_id']) && empty($SESSION['logged_in'])) {
                     $stmt = $pdo->prepare("SELECT * from sale_orders ORDER BY id DESC LIMIT $offset,$numOfrecs");
                     $stmt->execute();
                     $result = $stmt->fetchALL();
-                  }
+
                   ?>
                   <tbody>
                     <?php if($result) {

@@ -19,7 +19,7 @@ require 'config/common.php';
 	<!-- meta character set -->
 	<meta charset="UTF-8">
 	<!-- Site Title -->
-	<title>Karma Shop</title>
+	<title>AP Shop</title>
 	<!--
             CSS
             ============================================= -->
@@ -46,13 +46,43 @@ require 'config/common.php';
 						<span class="icon-bar"></span>
 						<span class="icon-bar"></span>
 					</button>
-					<!-- Collect the nav links, forms, and other content for toggling -->
+					<?php
+					$cart = 0;
+					if(!empty($_SESSION['cart'])) {
+						foreach($_SESSION['cart'] as $qty) {
+							$cart += $qty;
+						}
+					}
+					?>
 					<div class="collapse navbar-collapse offset" id="navbarSupportedContent">
 						<ul class="nav navbar-nav navbar-right">
-							<li class="nav-item"><a href="#" class="cart"><span class="ti-bag"></span></a></li>
+							<li class="nav-item">
+								<a href="cart.php" class="cart"><span class="ti-bag"><?php echo $cart?></span></a>
+							</li>
 							<li class="nav-item">
 								<button class="search"><span class="lnr lnr-magnifier" id="search"></span></button>
 							</li>
+							<?php
+							if(!empty($_SESSION['logged_in'])) {
+								echo "
+								<li class='nav-item'>
+									<a href='logout.php' type='button' class='fa fa-sign-out' style='margin-top: 30 !important;'>Logout</a>
+								</li>";
+							}else{
+								echo "
+								<li class='nav-item'>
+									<a href='Login.php' type='button' class='fa fa-sign-in' style='margin-top: 30 !important;'>Login</a>
+								</li>";
+							}
+							?>
+							<?php
+							if(!empty($_SESSION['user_role']) && $_SESSION['user_role'] == 1) {
+								echo "
+								<li class='nav-item' style='margin-top: 30 !important;'>
+								<a href='admin/index.php'>Admin Panel</a>
+								</li>";
+							}
+							?>
 						</ul>
 					</div>
 				</div>
@@ -71,11 +101,16 @@ require 'config/common.php';
 	</header>
 	<!-- End Header Area -->
 	<!-- Start Banner Area -->
-	<section class="banner-area organic-breadcrumb">
+	<section class="banner-area organic-breadcrumb" style="margin-bottom: 0px !important;">
 		<div class="container">
 			<div class="breadcrumb-banner d-flex flex-wrap align-items-center justify-content-end">
 				<div class="col-first">
-					<h1>Welcome</h1>
+					<h1>Welcome <?php echo !empty($_SESSION['username']) ? ucfirst($_SESSION['username']): '';?></h1>
+				<?php
+				if(empty($_SESSION['user_id']) && empty($_SESSION['logged_in'])) {
+				  echo "<h2>Please login to shop</h2>";
+				}
+				?>
 				</div>
 			</div>
 		</div>
