@@ -78,7 +78,7 @@ require 'config/common.php';
 							<?php
 							if(!empty($_SESSION['user_role']) && $_SESSION['user_role'] == 1) {
 								echo "
-								<li class='nav-item' style='margin-top: 30 !important;'>
+								<li class='nav-item' style='margin-top: 28 !important;'>
 								<a href='admin/index.php'>Admin Panel</a>
 								</li>";
 							}
