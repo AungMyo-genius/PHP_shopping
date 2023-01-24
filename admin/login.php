@@ -100,7 +100,7 @@ if($_POST) {
           <!-- /.col -->
           <div class="container">
             <button type="submit" class="btn btn-primary btn-block">Sign In</button>
-            <a href="register.php" type="button" class="btn btn-default btn-block">Register</a>
+            <a href="../index.php" type="button" class="btn btn-default btn-block">Not admin</a>
           </div>
           <!-- /.col -->
         </div>
